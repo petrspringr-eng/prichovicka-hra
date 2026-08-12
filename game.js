@@ -39,21 +39,21 @@ function updateDashboard() {
     document.getElementById("completedValue").textContent =
         completedCount + " / " + GAME.stations.length;
 
-    const clueList = document.getElementById("clueList");
+    const storyList = document.getElementById("storyList");
 
     if (completedCount === 0) {
-        clueList.innerHTML = "Zatím žádné.";
+        storyList.innerHTML = "Zatím žádné.";
         return;
     }
 
-    clueList.innerHTML = "";
+    storyList.innerHTML = "";
 
     GAME.stations.forEach(station => {
         if (completed[station.id]) {
-            clueList.innerHTML += `
-                <div class="clueItem">
+            storyList.innerHTML += `
+                <div class="storyItem">
                     <strong>Stanoviště ${station.id}</strong><br>
-                    ${station.clue}
+                    ${station.story}
                 </div>
             `;
         }
@@ -140,7 +140,7 @@ function openStation(id, isTest = false) {
 
     if (currentStation.type === "task") {
         answers.innerHTML = `
-            <div class="clueBox">
+            <div class="storyBox">
                 Po splnění úkolu klikněte na tlačítko Odeslat.
             </div>
         `;
@@ -209,9 +209,9 @@ function checkAnswer() {
                 Testovací režim – body ani postup se neukládají.
             </p>
 
-            <div class="clueBox">
+            <div class="storyBox">
                 <strong>Indicie:</strong><br>
-                ${currentStation.clue}
+                ${currentStation.story}
             </div>
 
             <p>
@@ -237,9 +237,9 @@ function checkAnswer() {
                 ✅ Toto stanoviště už máte splněné.
             </p>
 
-            <div class="clueBox">
+            <div class="storyBox">
                 <strong>Vaše indicie:</strong><br>
-                ${currentStation.clue}
+                ${currentStation.story}
             </div>
 
             <p>
@@ -252,7 +252,7 @@ function checkAnswer() {
 
     completed[currentStation.id] = {
         points: currentStation.points,
-        clue: currentStation.clue
+        story: currentStation.story
     };
 
     score += currentStation.points;
@@ -274,9 +274,9 @@ function checkAnswer() {
             <strong>${score} bodů</strong>
         </p>
 
-        <div class="clueBox">
+        <div class="storyBox">
             <strong>Vaše indicie:</strong><br>
-            ${currentStation.clue}
+            ${currentStation.story}
         </div>
     `;
 }

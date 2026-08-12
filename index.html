@@ -1,1 +1,82 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Příchovická hra</title>
 
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1 id="gameTitle">Příchovická hra</h1>
+</header>
+
+<main>
+
+    <section id="homeScreen">
+
+        <h2>Vyber svůj tým</h2>
+
+        <select id="teamSelect">
+            <option>Lišky</option>
+            <option>Vlci</option>
+            <option>Medvědi</option>
+            <option>Sovy</option>
+            <option>Bobři</option>
+            <option>Jeleni</option>
+        </select>
+
+        <button id="startButton">
+            Začít hru
+        </button>
+
+        <p class="adminLink">
+            <a href="#" id="adminLogin">
+                Organizátor
+            </a>
+        </p>
+
+    </section>
+
+    <section id="gameScreen" style="display:none;">
+
+        <h2 id="stationTitle"></h2>
+
+        <p id="stationQuestion"></p>
+
+        <div id="answers"></div>
+
+        <button id="submitAnswer">
+            Odeslat
+        </button>
+
+        <div id="result"></div>
+
+        <button id="backButton">
+            Zpět
+        </button>
+
+    </section>
+
+    <section id="adminScreen" style="display:none;">
+
+        <h2>Organizátor</h2>
+
+        <div id="stationList"></div>
+
+        <button id="closeAdmin">
+            Zavřít
+        </button>
+
+    </section>
+
+</main>
+
+<script src="gameData.js"></script>
+<script src="game.js"></script>
+
+</body>
+</html>

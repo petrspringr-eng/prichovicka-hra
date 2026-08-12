@@ -1,0 +1,115 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eef3ea;
+    color: #1f2a24;
+}
+
+header {
+    background: #2c5d3f;
+    color: white;
+    text-align: center;
+    padding: 18px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+main {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+section {
+    background: white;
+    border-radius: 16px;
+    padding: 22px;
+    margin-top: 20px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+h2 {
+    margin-top: 0;
+}
+
+select,
+input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #2c5d3f;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #3c7753;
+}
+
+.adminLink {
+    text-align: center;
+    margin-top: 28px;
+}
+
+.adminLink a {
+    color: #666;
+    font-size: 14px;
+}
+
+.answerOption {
+    display: block;
+    padding: 12px;
+    margin: 10px 0;
+    background: #f4f6f3;
+    border-radius: 10px;
+}
+
+#result {
+    margin-top: 18px;
+    font-size: 18px;
+}
+
+.good {
+    color: #1f7a3d;
+    font-weight: bold;
+}
+
+.bad {
+    color: #b6382c;
+    font-weight: bold;
+}
+
+.stationButton {
+    width: 64px;
+    margin: 5px;
+}
+
+.adminGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.clueBox {
+    margin-top: 14px;
+    padding: 14px;
+    background: #eef7ef;
+    border-radius: 10px;
+}

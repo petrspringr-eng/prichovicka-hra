@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Příchovická hra</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -16,22 +15,55 @@
 
 <main>
 
+    <!-- ÚVOD -->
     <section id="homeScreen">
 
-        <h2>Vyber svůj tým</h2>
+        <div id="teamSetup">
+            <h2>Vyberte svůj tým</h2>
 
-        <select id="teamSelect">
-            <option>Lišky</option>
-            <option>Vlci</option>
-            <option>Medvědi</option>
-            <option>Sovy</option>
-            <option>Bobři</option>
-            <option>Jeleni</option>
-        </select>
+            <select id="teamSelect">
+                <option>Lišky</option>
+                <option>Vlci</option>
+                <option>Medvědi</option>
+                <option>Sovy</option>
+                <option>Bobři</option>
+                <option>Jeleni</option>
+            </select>
 
-        <button id="startButton">
-            Začít hru
-        </button>
+            <button id="startButton">
+                Začít hru
+            </button>
+        </div>
+
+        <div id="dashboard" style="display:none;">
+
+            <h2 id="teamName"></h2>
+
+            <div class="scoreBox">
+                <span>⭐ Body</span>
+                <strong id="scoreValue">0</strong>
+            </div>
+
+            <div class="scoreBox">
+                <span>✅ Splněno</span>
+                <strong id="completedValue">0 / 20</strong>
+            </div>
+
+            <h3>Získané indicie</h3>
+
+            <div id="clueList">
+                Zatím žádné.
+            </div>
+
+            <p class="instruction">
+                📱 Najděte stanoviště v terénu a naskenujte jeho QR kód.
+            </p>
+
+            <button id="changeTeamButton" class="secondaryButton">
+                Změnit tým / reset
+            </button>
+
+        </div>
 
         <p class="adminLink">
             <a href="#" id="adminLogin">
@@ -41,11 +73,17 @@
 
     </section>
 
+
+    <!-- STANOVIŠTĚ -->
     <section id="gameScreen" style="display:none;">
+
+        <p id="testBanner" class="testBanner" style="display:none;">
+            🧪 TESTOVACÍ REŽIM
+        </p>
 
         <h2 id="stationTitle"></h2>
 
-        <p id="stationQuestion"></p>
+        <p id="stationQuestion" class="question"></p>
 
         <div id="answers"></div>
 
@@ -55,20 +93,27 @@
 
         <div id="result"></div>
 
-        <button id="backButton">
-            Zpět
+        <button id="backButton" class="secondaryButton">
+            Zpět na přehled
         </button>
 
     </section>
 
+
+    <!-- ORGANIZÁTOR -->
     <section id="adminScreen" style="display:none;">
 
-        <h2>Organizátor</h2>
+        <h2>👑 Organizátor</h2>
+
+        <p>
+            Kliknutím na číslo stanoviště simuluješ jeho QR kód.
+            V testovacím režimu se nic neukládá.
+        </p>
 
         <div id="stationList"></div>
 
-        <button id="closeAdmin">
-            Zavřít
+        <button id="closeAdmin" class="secondaryButton">
+            Zavřít organizátora
         </button>
 
     </section>

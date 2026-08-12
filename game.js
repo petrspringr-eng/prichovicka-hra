@@ -1,17 +1,18 @@
 let currentStation = null;
 let currentTeam = localStorage.getItem("team") || "";
 let score = Number(localStorage.getItem("score") || 0);
-
-const completed = JSON.parse(localStorage.getItem("completed") || "{}");
+let completed = JSON.parse(localStorage.getItem("completed") || "{}");
+let adminMode = false;
+let testMode = false;
 
 document.getElementById("gameTitle").textContent = GAME.title;
 
-function show(id) {
+function showScreen(screenId) {
     document.getElementById("homeScreen").style.display = "none";
     document.getElementById("gameScreen").style.display = "none";
     document.getElementById("adminScreen").style.display = "none";
 
-    document.getElementById(id).style.display = "block";
+    document.getElementById(screenId).style.display = "block";
 }
 
 function saveProgress() {
@@ -20,24 +21,85 @@ function saveProgress() {
     localStorage.setItem("completed", JSON.stringify(completed));
 }
 
+function updateDashboard() {
+    if (!currentTeam) {
+        document.getElementById("teamSetup").style.display = "block";
+        document.getElementById("dashboard").style.display = "none";
+        return;
+    }
+
+    document.getElementById("teamSetup").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+
+    document.getElementById("teamName").textContent = "Tým " + currentTeam;
+    document.getElementById("scoreValue").textContent = score;
+
+    const completedCount = Object.keys(completed).length;
+
+    document.getElementById("completedValue").textContent =
+        completedCount + " / " + GAME.stations.length;
+
+    const clueList = document.getElementById("clueList");
+
+    if (completedCount === 0) {
+        clueList.innerHTML = "Zatím žádné.";
+        return;
+    }
+
+    clueList.innerHTML = "";
+
+    GAME.stations.forEach(station => {
+        if (completed[station.id]) {
+            clueList.innerHTML += `
+                <div class="clueItem">
+                    <strong>Stanoviště ${station.id}</strong><br>
+                    ${station.clue}
+                </div>
+            `;
+        }
+    });
+}
+
 function startGame() {
     currentTeam = document.getElementById("teamSelect").value;
     saveProgress();
-
-    alert("Tým " + currentTeam + " je připraven. Teď naskenujte QR kód.");
+    updateDashboard();
 }
 
-document.getElementById("startButton").addEventListener("click", startGame);
+function resetGame() {
+    const ok = confirm(
+        "Opravdu chcete smazat tým, body a všechna splněná stanoviště na tomto telefonu?"
+    );
 
-function openStation(id, testMode = false) {
-    currentStation = GAME.stations.find(s => s.id === Number(id));
+    if (!ok) return;
+
+    localStorage.removeItem("team");
+    localStorage.removeItem("score");
+    localStorage.removeItem("completed");
+
+    currentTeam = "";
+    score = 0;
+    completed = {};
+
+    updateDashboard();
+}
+
+function openStation(id, isTest = false) {
+    currentStation = GAME.stations.find(
+        station => station.id === Number(id)
+    );
 
     if (!currentStation) {
         alert("Stanoviště neexistuje.");
         return;
     }
 
-    show("gameScreen");
+    testMode = isTest;
+
+    showScreen("gameScreen");
+
+    const testBanner = document.getElementById("testBanner");
+    testBanner.style.display = testMode ? "block" : "none";
 
     document.getElementById("stationTitle").textContent =
         currentStation.title;
@@ -71,6 +133,7 @@ function openStation(id, testMode = false) {
                 id="textAnswer"
                 type="text"
                 placeholder="Napište odpověď"
+                autocomplete="off"
             >
         `;
     }
@@ -78,13 +141,10 @@ function openStation(id, testMode = false) {
     if (currentStation.type === "task") {
         answers.innerHTML = `
             <div class="clueBox">
-                Po splnění úkolu klikněte na Odeslat.
+                Po splnění úkolu klikněte na tlačítko Odeslat.
             </div>
         `;
     }
-
-    document.getElementById("submitAnswer").dataset.test =
-        testMode ? "1" : "0";
 }
 
 function answerIsCorrect() {
@@ -108,8 +168,8 @@ function answerIsCorrect() {
             return false;
         }
 
-        return input.value.trim().toLowerCase() ===
-            String(currentStation.answer).trim().toLowerCase();
+        return normalizeText(input.value) ===
+            normalizeText(currentStation.answer);
     }
 
     if (currentStation.type === "task") {
@@ -119,106 +179,136 @@ function answerIsCorrect() {
     return false;
 }
 
+function normalizeText(text) {
+    return String(text)
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
 function checkAnswer() {
     if (!currentStation) return;
-
-    const testMode =
-        document.getElementById("submitAnswer").dataset.test === "1";
 
     const result = document.getElementById("result");
 
     if (!answerIsCorrect()) {
-        result.innerHTML =
-            `<p class="bad">Špatně. Zkuste to znovu.</p>`;
+        result.innerHTML = `
+            <p class="bad">
+                ❌ Špatně. Zkuste to znovu.
+            </p>
+        `;
         return;
     }
 
     if (testMode) {
         result.innerHTML = `
-            <p class="good">Správně.</p>
-            <p>TESTOVACÍ REŽIM – nic se neukládá.</p>
+            <p class="good">✅ Správně.</p>
+
+            <p>
+                Testovací režim – body ani postup se neukládají.
+            </p>
+
             <div class="clueBox">
                 <strong>Indicie:</strong><br>
                 ${currentStation.clue}
             </div>
+
+            <p>
+                Hodnota stanoviště:
+                <strong>${currentStation.points} bodů</strong>
+            </p>
         `;
+        return;
+    }
+
+    if (!currentTeam) {
+        alert(
+            "Nejdřív vyberte svůj tým na úvodní stránce."
+        );
+        showScreen("homeScreen");
+        updateDashboard();
         return;
     }
 
     if (completed[currentStation.id]) {
         result.innerHTML = `
-            <p class="good">Toto stanoviště už máte splněné.</p>
+            <p class="good">
+                ✅ Toto stanoviště už máte splněné.
+            </p>
+
             <div class="clueBox">
-                <strong>Indicie:</strong><br>
+                <strong>Vaše indicie:</strong><br>
                 ${currentStation.clue}
             </div>
+
+            <p>
+                Celkem máte:
+                <strong>${score} bodů</strong>
+            </p>
         `;
         return;
     }
 
-    completed[currentStation.id] = true;
+    completed[currentStation.id] = {
+        points: currentStation.points,
+        clue: currentStation.clue
+    };
+
     score += currentStation.points;
+
     saveProgress();
 
     result.innerHTML = `
-        <p class="good">Správně!</p>
-        <p><strong>+${currentStation.points} bodů</strong></p>
-        <p>Celkem máte: <strong>${score} bodů</strong></p>
+        <p class="good">
+            🎉 Správně!
+        </p>
+
+        <p>
+            Získáváte
+            <strong>+${currentStation.points} bodů</strong>.
+        </p>
+
+        <p>
+            Celkem máte:
+            <strong>${score} bodů</strong>
+        </p>
+
         <div class="clueBox">
-            <strong>Indicie:</strong><br>
+            <strong>Vaše indicie:</strong><br>
             ${currentStation.clue}
         </div>
     `;
 }
 
-document
-    .getElementById("submitAnswer")
-    .addEventListener("click", checkAnswer);
-
-document
-    .getElementById("backButton")
-    .addEventListener("click", () => {
-        show("homeScreen");
-    });
-
-document
-    .getElementById("adminLogin")
-    .addEventListener("click", e => {
-        e.preventDefault();
-
-        const password = prompt("Heslo organizátora:");
-
-        if (password !== GAME.adminPassword) {
-            alert("Špatné heslo.");
-            return;
-        }
-
-        openAdmin();
-    });
-
 function openAdmin() {
-    show("adminScreen");
+    adminMode = true;
+    showScreen("adminScreen");
 
-    const list = document.getElementById("stationList");
-    list.innerHTML = `
+    const stationList = document.getElementById("stationList");
+
+    stationList.innerHTML = `
         <p>
-            Tým: <strong>${currentTeam || "zatím nevybrán"}</strong><br>
-            Body: <strong>${score}</strong>
+            Kliknutím na číslo otevřeš stanoviště
+            v testovacím režimu.
+        </p>
+
+        <div class="adminGrid" id="adminGrid"></div>
+
+        <hr>
+
+        <p>
+            Aktuální tým:
+            <strong>${currentTeam || "žádný"}</strong>
         </p>
 
         <p>
-            Kliknutím otevřeš stanoviště v testovacím režimu.
-            Nic se nebude ukládat.
+            Aktuální skóre:
+            <strong>${score}</strong>
         </p>
-
-        <div class="adminGrid"></div>
-
-        <button id="resetProgress">
-            Resetovat postup tohoto telefonu
-        </button>
     `;
 
-    const grid = list.querySelector(".adminGrid");
+    const grid = document.getElementById("adminGrid");
 
     GAME.stations.forEach(station => {
         const button = document.createElement("button");
@@ -232,43 +322,63 @@ function openAdmin() {
 
         grid.appendChild(button);
     });
-
-    document
-        .getElementById("resetProgress")
-        .addEventListener("click", resetProgress);
 }
 
-function resetProgress() {
-    const yes = confirm(
-        "Opravdu chcete smazat tým, body a všechna splněná stanoviště na tomto telefonu?"
-    );
+document
+    .getElementById("startButton")
+    .addEventListener("click", startGame);
 
-    if (!yes) return;
+document
+    .getElementById("submitAnswer")
+    .addEventListener("click", checkAnswer);
 
-    localStorage.removeItem("team");
-    localStorage.removeItem("score");
-    localStorage.removeItem("completed");
-
-    currentTeam = "";
-    score = 0;
-
-    Object.keys(completed).forEach(key => {
-        delete completed[key];
+document
+    .getElementById("backButton")
+    .addEventListener("click", () => {
+        if (adminMode && testMode) {
+            openAdmin();
+        } else {
+            showScreen("homeScreen");
+            updateDashboard();
+        }
     });
 
-    alert("Postup byl smazán.");
-    show("homeScreen");
-}
+document
+    .getElementById("changeTeamButton")
+    .addEventListener("click", resetGame);
+
+document
+    .getElementById("adminLogin")
+    .addEventListener("click", event => {
+        event.preventDefault();
+
+        const password = prompt("Heslo organizátora:");
+
+        if (password !== GAME.adminPassword) {
+            alert("Špatné heslo.");
+            return;
+        }
+
+        openAdmin();
+    });
 
 document
     .getElementById("closeAdmin")
     .addEventListener("click", () => {
-        show("homeScreen");
+        adminMode = false;
+        testMode = false;
+
+        showScreen("homeScreen");
+        updateDashboard();
     });
+
+updateDashboard();
 
 const params = new URLSearchParams(window.location.search);
 
 if (params.has("s")) {
-    const stationId = Number(params.get("s"));
-    openStation(stationId, false);
+    openStation(
+        Number(params.get("s")),
+        false
+    );
 }

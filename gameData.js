@@ -9,21 +9,18 @@ const GAME = {
             question: "Jak se jmenuje rozhledna stojící vedle Muzea Járy Cimrmana v Příchovicích?",
             type: "choice",
             options: ["Štěpánka", "Maják", "Královka", "Smrk"],
-            correct: 2,
+            correct: 1,
             points: 10,
-            clue: "
-
+            story: `
 📜 Stránka deníku č. 1
 
-"Dnes jsem konečně nalezl místo,
-
+„Dnes jsem konečně nalezl místo,
 kde bude můj poslední vynález
-
 v bezpečí.
 
 Lidé chodí kolem,
-
-ale nikdo se nedívá správným směrem."
+ale nikdo se nedívá správným směrem.“
+`
         },
         {
             id: 2,
@@ -33,7 +30,7 @@ ale nikdo se nedívá správným směrem."
             options: ["Dub", "Buk", "Smrk", "Javor"],
             correct: 2,
             points: 10,
-            clue: "DUB"
+            story: "DUB"
         },
         {
             id: 3,
@@ -42,7 +39,7 @@ ale nikdo se nedívá správným směrem."
             type: "text",
             answer: "60",
             points: 10,
-            clue: "U"
+            story: "U"
         },
         {
             id: 4,
@@ -50,7 +47,7 @@ ale nikdo se nedívá správným směrem."
             question: "Najděte něco kulatého v přírodě.",
             type: "task",
             points: 15,
-            clue: "CESTY"
+            story: "CESTY"
         },
         {
             id: 5,
@@ -59,7 +56,7 @@ ale nikdo se nedívá správným směrem."
             type: "text",
             answer: "1000",
             points: 10,
-            clue: "POD"
+            story: "POD"
         },
         {
             id: 6,
@@ -69,7 +66,7 @@ ale nikdo se nedívá správným směrem."
             options: ["Jih", "Sever", "Východ", "Západ"],
             correct: 1,
             points: 10,
-            clue: "VELKÝM"
+            story: "VELKÝM"
         },
         {
             id: 7,
@@ -77,7 +74,7 @@ ale nikdo se nedívá správným směrem."
             question: "Vyfoťte celý tým.",
             type: "task",
             points: 15,
-            clue: "STROMEM"
+            story: "STROMEM"
         },
         {
             id: 8,
@@ -86,7 +83,7 @@ ale nikdo se nedívá správným směrem."
             type: "text",
             answer: "56",
             points: 10,
-            clue: "HLEDEJTE"
+            story: "HLEDEJTE"
         },
         {
             id: 9,
@@ -94,7 +91,7 @@ ale nikdo se nedívá správným směrem."
             question: "Najděte jiný tým a udělejte si společnou fotku.",
             type: "task",
             points: 25,
-            clue: "ZNAČKU"
+            story: "ZNAČKU"
         },
         {
             id: 10,
@@ -104,7 +101,7 @@ ale nikdo se nedívá správným směrem."
             options: ["Teploměr", "Kompas", "Stopky", "Metr"],
             correct: 1,
             points: 10,
-            clue: "TŘI"
+            story: "TŘI"
         },
         {
             id: 11,
@@ -113,7 +110,7 @@ ale nikdo se nedívá správným směrem."
             type: "text",
             answer: "7",
             points: 10,
-            clue: "KROKY"
+            story: "KROKY"
         },
         {
             id: 12,
@@ -121,7 +118,7 @@ ale nikdo se nedívá správným směrem."
             question: "Postavte z přírodních materiálů šipku.",
             type: "task",
             points: 15,
-            clue: "VLEVO"
+            story: "VLEVO"
         },
         {
             id: 13,
@@ -136,7 +133,7 @@ ale nikdo se nedívá správným směrem."
             ],
             correct: 1,
             points: 20,
-            clue: "OD"
+            story: "OD"
         },
         {
             id: 14,
@@ -145,7 +142,7 @@ ale nikdo se nedívá správným směrem."
             type: "text",
             answer: "60",
             points: 10,
-            clue: "LAVIČKY"
+            story: "LAVIČKY"
         },
         {
             id: 15,
@@ -153,7 +150,7 @@ ale nikdo se nedívá správným směrem."
             question: "Najděte něco přírodního ve tvaru písmene Y.",
             type: "task",
             points: 15,
-            clue: "JE"
+            story: "JE"
         },
         {
             id: 16,
@@ -163,7 +160,7 @@ ale nikdo se nedívá správným směrem."
             options: ["Červená", "Fialová", "Oranžová", "Černá"],
             correct: 0,
             points: 20,
-            clue: "CÍL"
+            story: "CÍL"
         },
         {
             id: 17,
@@ -172,7 +169,7 @@ ale nikdo se nedívá správným směrem."
             type: "text",
             answer: "5",
             points: 10,
-            clue: "BONUS 1"
+            story: "BONUS 1"
         },
         {
             id: 18,
@@ -180,7 +177,7 @@ ale nikdo se nedívá správným směrem."
             question: "Vymyslete desetisekundový týmový pokřik.",
             type: "task",
             points: 20,
-            clue: "BONUS 2"
+            story: "BONUS 2"
         },
         {
             id: 19,
@@ -195,7 +192,7 @@ ale nikdo se nedívá správným směrem."
             ],
             correct: 1,
             points: 20,
-            clue: "BONUS 3"
+            story: "BONUS 3"
         },
         {
             id: 20,
@@ -203,7 +200,7 @@ ale nikdo se nedívá správným směrem."
             question: "Najděte jiný tým a zjistěte jméno nejstaršího člena.",
             type: "task",
             points: 25,
-            clue: "BONUS 4"
+            story: "BONUS 4"
         }
     ]
 };

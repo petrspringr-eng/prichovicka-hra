@@ -1,17 +1,29 @@
 const GAME = {
-    title: "Příchovická hra",
+    title: "Cimrmanova poslední výprava",
     adminPassword: "medved",
 
     stations: [
         {
             id: 1,
-            title: "Stanoviště 1",
-            question: "Kolik je 2 + 2?",
+            title: "Poslední deník Járy Cimrmana",
+            question: "Jak se jmenuje rozhledna stojící vedle Muzea Járy Cimrmana v Příchovicích?",
             type: "choice",
-            options: ["3", "4", "5", "6"],
-            correct: 1,
+            options: ["Štěpánka", "Maják", "Královka", "Smrk"],
+            correct: 2,
             points: 10,
-            clue: "STARÝ"
+            clue: "
+
+📜 Stránka deníku č. 1
+
+"Dnes jsem konečně nalezl místo,
+
+kde bude můj poslední vynález
+
+v bezpečí.
+
+Lidé chodí kolem,
+
+ale nikdo se nedívá správným směrem."
         },
         {
             id: 2,

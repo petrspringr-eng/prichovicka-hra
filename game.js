@@ -2,6 +2,7 @@ let currentStation = null;
 let currentTeam = localStorage.getItem("team") || "";
 let score = Number(localStorage.getItem("score") || 0);
 let completed = JSON.parse(localStorage.getItem("completed") || "{}");
+
 let adminMode = false;
 let testMode = false;
 
@@ -11,13 +12,12 @@ function showScreen(screenId) {
     document.getElementById("homeScreen").style.display = "none";
     document.getElementById("gameScreen").style.display = "none";
     document.getElementById("adminScreen").style.display = "none";
-
     document.getElementById(screenId).style.display = "block";
 }
 
 function saveProgress() {
     localStorage.setItem("team", currentTeam);
-    localStorage.setItem("score", score);
+    localStorage.setItem("score", String(score));
     localStorage.setItem("completed", JSON.stringify(completed));
 }
 
@@ -35,11 +35,14 @@ function updateDashboard() {
     document.getElementById("scoreValue").textContent = score;
 
     const completedCount = Object.keys(completed).length;
-
     document.getElementById("completedValue").textContent =
         completedCount + " / " + GAME.stations.length;
 
-    const storyList = document.getElementById("storyList");
+    const storyList =
+        document.getElementById("storyList") ||
+        document.getElementById("clueList");
+
+    if (!storyList) return;
 
     if (completedCount === 0) {
         storyList.innerHTML = "Zatím žádné.";
@@ -50,10 +53,13 @@ function updateDashboard() {
 
     GAME.stations.forEach(station => {
         if (completed[station.id]) {
+            const savedStory =
+                completed[station.id].story || station.story || "";
+
             storyList.innerHTML += `
-                <div class="storyItem">
-                    <strong>Stanoviště ${station.id}</strong><br>
-                    ${station.story}
+                <div class="clueItem">
+                    <strong>📜 Stránka deníku č. ${station.id}</strong><br>
+                    ${savedStory}
                 </div>
             `;
         }
@@ -63,6 +69,17 @@ function updateDashboard() {
 function startGame() {
     currentTeam = document.getElementById("teamSelect").value;
     saveProgress();
+    showDashboard();
+}
+
+function showDashboard() {
+    adminMode = false;
+    testMode = false;
+    currentStation = null;
+
+    history.replaceState({}, "", window.location.pathname);
+
+    showScreen("homeScreen");
     updateDashboard();
 }
 
@@ -81,6 +98,8 @@ function resetGame() {
     score = 0;
     completed = {};
 
+    history.replaceState({}, "", window.location.pathname);
+    showScreen("homeScreen");
     updateDashboard();
 }
 
@@ -95,11 +114,12 @@ function openStation(id, isTest = false) {
     }
 
     testMode = isTest;
-
     showScreen("gameScreen");
 
     const testBanner = document.getElementById("testBanner");
-    testBanner.style.display = testMode ? "block" : "none";
+    if (testBanner) {
+        testBanner.style.display = testMode ? "block" : "none";
+    }
 
     document.getElementById("stationTitle").textContent =
         currentStation.title;
@@ -109,6 +129,13 @@ function openStation(id, isTest = false) {
 
     document.getElementById("result").innerHTML = "";
 
+    const submitButton = document.getElementById("submitAnswer");
+    submitButton.style.display = "block";
+
+    const backButton = document.getElementById("backButton");
+    backButton.textContent =
+        testMode ? "Zpět do organizátora" : "Zpět na přehled";
+
     const answers = document.getElementById("answers");
     answers.innerHTML = "";
 
@@ -116,11 +143,7 @@ function openStation(id, isTest = false) {
         currentStation.options.forEach((option, index) => {
             answers.innerHTML += `
                 <label class="answerOption">
-                    <input
-                        type="radio"
-                        name="answer"
-                        value="${index}"
-                    >
+                    <input type="radio" name="answer" value="${index}">
                     ${option}
                 </label>
             `;
@@ -140,7 +163,7 @@ function openStation(id, isTest = false) {
 
     if (currentStation.type === "task") {
         answers.innerHTML = `
-            <div class="storyBox">
+            <div class="clueBox">
                 Po splnění úkolu klikněte na tlačítko Odeslat.
             </div>
         `;
@@ -187,31 +210,21 @@ function normalizeText(text) {
         .replace(/[\u0300-\u036f]/g, "");
 }
 
-function checkAnswer() {
-    if (!currentStation) return;
-
+function renderSuccess(alreadyCompleted = false) {
     const result = document.getElementById("result");
+    const submitButton = document.getElementById("submitAnswer");
+    const backButton = document.getElementById("backButton");
 
-    if (!answerIsCorrect()) {
-        result.innerHTML = `
-            <p class="bad">
-                ❌ Špatně. Zkuste to znovu.
-            </p>
-        `;
-        return;
-    }
+    submitButton.style.display = "none";
 
     if (testMode) {
         result.innerHTML = `
             <p class="good">✅ Správně.</p>
+            <p>Testovací režim – body ani postup se neukládají.</p>
 
-            <p>
-                Testovací režim – body ani postup se neukládají.
-            </p>
-
-            <div class="storyBox">
-                <strong>Indicie:</strong><br>
-                ${currentStation.story}
+            <div class="clueBox">
+                <strong>📜 Stránka Cimrmanova deníku</strong><br><br>
+                ${currentStation.story || ""}
             </div>
 
             <p>
@@ -219,70 +232,94 @@ function checkAnswer() {
                 <strong>${currentStation.points} bodů</strong>
             </p>
         `;
+
+        backButton.textContent = "Zpět do organizátora";
+        return;
+    }
+
+    if (alreadyCompleted) {
+        result.innerHTML = `
+            <p class="good">✅ Toto stanoviště už máte splněné.</p>
+
+            <div class="clueBox">
+                <strong>📜 Stránka Cimrmanova deníku</strong><br><br>
+                ${currentStation.story || ""}
+            </div>
+
+            <p>Celkem máte: <strong>${score} bodů</strong></p>
+        `;
+    } else {
+        result.innerHTML = `
+            <p class="good">🎉 Správně!</p>
+
+            <p>
+                Získáváte
+                <strong>+${currentStation.points} bodů</strong>.
+            </p>
+
+            <p>Celkem máte: <strong>${score} bodů</strong></p>
+
+            <div class="clueBox">
+                <strong>📜 Stránka Cimrmanova deníku</strong><br><br>
+                ${currentStation.story || ""}
+            </div>
+        `;
+    }
+
+    backButton.textContent = "Pokračovat";
+}
+
+function checkAnswer() {
+    if (!currentStation) return;
+
+    const result = document.getElementById("result");
+
+    if (!answerIsCorrect()) {
+        result.innerHTML = `
+            <p class="bad">❌ Špatně. Zkuste to znovu.</p>
+        `;
+        return;
+    }
+
+    if (testMode) {
+        renderSuccess(false);
         return;
     }
 
     if (!currentTeam) {
-        alert(
-            "Nejdřív vyberte svůj tým na úvodní stránce."
-        );
+        alert("Nejdřív vyberte svůj tým.");
         showScreen("homeScreen");
         updateDashboard();
         return;
     }
 
     if (completed[currentStation.id]) {
-        result.innerHTML = `
-            <p class="good">
-                ✅ Toto stanoviště už máte splněné.
-            </p>
-
-            <div class="storyBox">
-                <strong>Vaše indicie:</strong><br>
-                ${currentStation.story}
-            </div>
-
-            <p>
-                Celkem máte:
-                <strong>${score} bodů</strong>
-            </p>
-        `;
+        renderSuccess(true);
         return;
     }
 
     completed[currentStation.id] = {
         points: currentStation.points,
-        story: currentStation.story
+        story: currentStation.story || ""
     };
 
     score += currentStation.points;
-
     saveProgress();
 
-    result.innerHTML = `
-        <p class="good">
-            🎉 Správně!
-        </p>
-
-        <p>
-            Získáváte
-            <strong>+${currentStation.points} bodů</strong>.
-        </p>
-
-        <p>
-            Celkem máte:
-            <strong>${score} bodů</strong>
-        </p>
-
-        <div class="storyBox">
-            <strong>Vaše indicie:</strong><br>
-            ${currentStation.story}
-        </div>
-    `;
+    renderSuccess(false);
 }
 
 function openAdmin() {
+    currentTeam = localStorage.getItem("team") || currentTeam;
+    score = Number(localStorage.getItem("score") || score || 0);
+    completed = JSON.parse(
+        localStorage.getItem("completed") ||
+        JSON.stringify(completed || {})
+    );
+
     adminMode = true;
+    testMode = false;
+
     showScreen("adminScreen");
 
     const stationList = document.getElementById("stationList");
@@ -290,7 +327,7 @@ function openAdmin() {
     stationList.innerHTML = `
         <p>
             Kliknutím na číslo otevřeš stanoviště
-            v testovacím režimu.
+            v testovacím režimu. Nic se neuloží.
         </p>
 
         <div class="adminGrid" id="adminGrid"></div>
@@ -299,7 +336,7 @@ function openAdmin() {
 
         <p>
             Aktuální tým:
-            <strong>${currentTeam || "žádný"}</strong>
+            <strong>${currentTeam || "zatím nevybrán"}</strong>
         </p>
 
         <p>
@@ -337,10 +374,10 @@ document
     .addEventListener("click", () => {
         if (adminMode && testMode) {
             openAdmin();
-        } else {
-            showScreen("homeScreen");
-            updateDashboard();
+            return;
         }
+
+        showDashboard();
     });
 
 document
@@ -365,20 +402,15 @@ document
 document
     .getElementById("closeAdmin")
     .addEventListener("click", () => {
-        adminMode = false;
-        testMode = false;
-
-        showScreen("homeScreen");
-        updateDashboard();
+        showDashboard();
     });
 
-updateDashboard();
-
 const params = new URLSearchParams(window.location.search);
+const stationFromQr = params.get("s");
 
-if (params.has("s")) {
-    openStation(
-        Number(params.get("s")),
-        false
-    );
+if (stationFromQr) {
+    openStation(Number(stationFromQr), false);
+} else {
+    showScreen("homeScreen");
+    updateDashboard();
 }

@@ -15,7 +15,7 @@ const GAME = {
         "Vrať se"
     ],
     correct: 1,
-    points: 10,
+    points: 15,
     story: `
 📜 Stránka deníku č. 1
 
@@ -96,7 +96,7 @@ SMĚREM
         "Praděd"
     ],
     correct: 2,
-    points: 10,
+    points: 15,
     story: `
 📜 Stránka deníku č. 4
 
@@ -176,7 +176,7 @@ K PRVNÍMU
         "Nemocnice"
     ],
     correct: 1,
-    points: 10,
+    points: 15,
     story: `
 📜 Stránka deníku č. 7
 
@@ -254,7 +254,7 @@ SE OTOČ O
         "180"
     ],
     correct: 3,
-    points: 10,
+    points: 15,
     story: `
 📜 Stránka deníku č. 10
 
@@ -411,7 +411,7 @@ HLEDEJ
         "U pařezu"
     ],
     correct: 1,
-    points: 10,
+    points: 15,
     story: `
 📜 Stránka deníku č. 16
 
@@ -523,7 +523,7 @@ V MÍSTĚ
         "Okap"
     ],
     correct: 0,
-    points: 20,
+    points: 10,
     story: `
 📜 Poslední nalezená stránka deníku Járy Cimrmana
 
